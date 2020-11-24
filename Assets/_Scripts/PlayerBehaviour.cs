@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class PlayerBehaviour : MonoBehaviour
     public int lives;
     public int health;
     public BarController healthBar;
+    public Animator livesHUD;
 
     private Rigidbody2D m_rigidBody2D;
     private SpriteRenderer m_spriteRenderer;
@@ -171,6 +173,8 @@ public class PlayerBehaviour : MonoBehaviour
     {
         lives -= 1;
 
+        livesHUD.SetInteger("LivesState", lives);
+
         if (lives > 0)
         {
             health = 100;
@@ -180,7 +184,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
         else
         {
-            // go to end scene
+            SceneManager.LoadScene("End");
         }
     }
 
