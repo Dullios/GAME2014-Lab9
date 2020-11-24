@@ -5,11 +5,14 @@ using UnityEngine;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    [Header("Controls")]
     public Joystick joystick;
     public float joystickHorizontalSensitivity;
     public float joystickVerticalSensitivity;
     public float horizontalForce;
     public float verticalForce;
+
+    [Header("Platform Detection")]
     public bool isGrounded;
     public bool isJumping;
     public bool isCrouching;
@@ -20,6 +23,11 @@ public class PlayerBehaviour : MonoBehaviour
     public LayerMask collisionWallLayer;
     public RampDirection rampDirection;
     public bool onRamp;
+
+    [Header("Player Stats")]
+    public int lives;
+    public int health;
+    public BarController healthBar;
 
     private Rigidbody2D m_rigidBody2D;
     private SpriteRenderer m_spriteRenderer;
@@ -157,7 +165,40 @@ public class PlayerBehaviour : MonoBehaviour
                 isCrouching = false;
             }
         }
+    }
 
+    public void LoseLife()
+    {
+        lives -= 1;
+
+        if (lives > 0)
+        {
+            health = 100;
+            healthBar.SetValue(health);
+
+            transform.position = spawnPoint.position;
+        }
+        else
+        {
+            // go to end scene
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        healthBar.SetValue(health);
+
+        if (health <= 0)
+            LoseLife();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            TakeDamage(15);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -165,7 +206,12 @@ public class PlayerBehaviour : MonoBehaviour
         // respawn
         if (other.gameObject.CompareTag("DeathPlane"))
         {
-            transform.position = spawnPoint.position;
+            LoseLife();
+        }
+
+        if(other.gameObject.CompareTag("Bullet"))
+        {
+            TakeDamage(10);
         }
     }
 }
